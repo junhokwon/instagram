@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 # 장고가 기본적으로 제공하는 User와 연결
@@ -7,11 +8,11 @@ class Post(models.Model):
     title = models.CharField(max_length=50)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
     photo = models.ImageField(blank=True)
     # image를 처리하기 위해서 pillow을 깔아야한다.
     like_users = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name ='like_posts',
         through = 'PostLike',
     )
@@ -25,7 +26,7 @@ class Post(models.Model):
         if not self.tags.filter(id=tag.id).exists():
             self.tags.add(tag)
             # tags는 다대다관계로 Post와 연결되어있기에, Tag클래스에서 만들어진
-            # 속성 name을 가져온다.
+            # 속성 name을 가져온.
 
     @property
     def like_count(self):
@@ -39,25 +40,25 @@ class Post(models.Model):
 
 class PostLike(models.Model):
     post = models.ForeignKey(Post)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_date = models.DateTimeField(auto_now_add=True)
 
 
 class Comment(models.Model):
     post = models.ForeignKey(Post)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
     content = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name = 'like_comments',
         through = 'CommentLike',
     )
 
 class CommentLike(models.Model):
     comment = models.ForeignKey(Comment)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_date = models.DateTimeField(auto_now_add=True)
 
 
