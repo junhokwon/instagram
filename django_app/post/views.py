@@ -24,7 +24,17 @@ def post_list(request):
 
 
 def post_detail(request, post_pk):
-    post = Post.objects.get(pk=post_pk)
+
+    # 가져오는 과정에서 예외처리를 한다
+    try:
+        post = Post.objects.get(pk=post_pk)
+    except Post.DoesNotExist as e:
+        return HttpResponse('post not found, detail : {}'.format(e))
+        # 1. 404 에러를 띄어준다.
+        # 2. redirect 함수를 이용하여 post_list로 되돌려준다. redirect는 모델,view_name,절대경로 url
+        # redirect(url_name,
+        return redirect('post:post_list')
+    
     # 모델(DB)에서 post_pk에 해당하는 Post객체를(인스턴스를 가져와 변수에 할당
     # 한개의 객체를 가져오기 모델매니저(objects)의 get()메서드를 가져온다.
     # request에 대해 response를 돌려줄때는 HttpResponse 나 render를 사용가능
