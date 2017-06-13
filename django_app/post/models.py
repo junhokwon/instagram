@@ -9,14 +9,15 @@ class Post(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    photo = models.ImageField(blank=True)
+    photo = models.ImageField(upload_to='post',blank=True)
+    # ImageField는 ImageFileField로 변환된다. 즉 file로 처리한다는것
     # image를 처리하기 위해서 pillow을 깔아야한다.
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name ='like_posts',
         through = 'PostLike',
     )
-    tags = models.ManyToManyField('Tag')
+    tags = models.ManyToManyField('Tag',blank=True)
 
     def add_comment(self,user,content):
         self.comment_set.create(author=user,content=content)
