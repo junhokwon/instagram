@@ -131,7 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFIELS_DIRS = [
+STATICFILES_DIRS = [
     STATIC_DIR,
 ]
 
@@ -139,3 +139,7 @@ STATICFIELS_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+# Media file은 이용자가 웹에서 올리는 (upload)파일,
+# 파일 자체는 고정되었으나, 언제 올릴지 모르기에,장고에서 준비를 해놓지 않았다.
+# Media_root는 업로드가 끝난 파일을 배치할 최상위 경로 지정

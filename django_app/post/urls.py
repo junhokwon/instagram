@@ -13,14 +13,17 @@ urlpatterns = [
 
     # (2) 정규표현식에서 키워드인수 (?p<post_pk>\d+)로 주는방법
     url(r'^(?P<post_pk>\d+)/$', views.post_detail, name='post_detail'),
-    url(r'^/create/$', views.post_create, name='post_create'),
-    url(r'^(?P<post_pk>\d+)/modify/$', views.post_modify, name='post_modify'),
-    url(r'^(?P<post_pk>\d+)/delete/$', views.post_delete, name='post_delete'),
+
 ]
 
-app_name = 'comment'
-urlpatterns = [
-    url(r'^/create/$', views.comment_create,name='comment_create'),
-    url(r'^(?P<post_pk>\d+)/delete/$', views.comment_delete,name='comment_delete'),
-    url(r'^(?P<post_pk>\d+)/modify/$', views.comment_modify,name='comment_modify'),
-]
+#     url(r'^/create/$', views.post_create, name='post_create'),
+#     url(r'^(?P<post_pk>\d+)/modify/$', views.post_modify, name='post_modify'),
+#     url(r'^(?P<post_pk>\d+)/delete/$', views.post_delete, name='post_delete'),
+# ]
+#
+# app_name = 'comment'
+# urlpatterns = [
+#     url(r'^/create/$', views.comment_create,name='comment_create'),
+#     url(r'^(?P<post_pk>\d+)/delete/$', views.comment_delete,name='comment_delete'),
+#     url(r'^(?P<post_pk>\d+)/modify/$', views.comment_modify,name='comment_modify'),
+# ]

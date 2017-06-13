@@ -31,3 +31,6 @@ urlpatterns += static(
         prefix = settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,
 )
+
+# urls.py에 media 파일을 제공하는 url패턴등록부분을 고친다.
+# static 함수에 첫번째 인자로 media file url,키워드인자 document_root로 media file이 위치한 경로

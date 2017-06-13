@@ -15,10 +15,8 @@ def post_list(request):
 
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
     posts = Post.objects.all()
-    posts_comments_list = posts.add_comment.order_by[:-4]
     context = {
         'posts' : posts,
-        'posts_comments_list' : posts_comments_list,
     }
     return render(request, 'post/post_list.html', context)
 
@@ -41,8 +39,8 @@ def post_detail(request, post_pk):
     # template를 사용하려면 render함수를 사용한다.
     # render함수는 django.template.loader.get_template함수와
     # django.http.HttpResponse함수를 축약해놓은 shortcut
-    # django가 템플릿을 검색할 수 있는 모든 디렉토리 순회,
-    # 인자로 주어진 문자열값(context)과 일치하는 템플릿이 있는지 확인 후,
+    # render함수는 django가 템플릿을 검색 할 수 있는 모든 디렉토리 순회,
+    # 인자로 주어진 문자열값과 일치하는 템플릿이 있는지 확인 후,
     # 결과를 리턴 (django.template.backends.django.Template클라스형 객체
     template = loader.get_template('post/post_detail.html')
     # dict형 변수 context의 'post'키에 post객체를 할당

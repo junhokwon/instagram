@@ -1,15 +1,11 @@
 {% extends 'common/base.html' %}
 
 
-{% content block %}
+{% block content %}
 {% for post in posts %}
-<div>
-    <span>{{ post.id }}</span>
-    <span>{{ post.photo.url }}</span>
-    <img src="{{ post.photo.url }}" alt="">
-    <span>{{ post.comment_set.all() }}</span>
-</div>
+
+{% include 'include/post.html' %}
+
 {% endfor %}
 
 {% endblock %}
-

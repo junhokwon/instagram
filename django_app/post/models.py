@@ -10,6 +10,7 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
     photo = models.ImageField(upload_to='post',blank=True)
+    # upload_to = 'post'는 post/~로 이미지파일경로가 정해진다.
     # ImageField는 ImageFileField로 변환된다. 즉 file로 처리한다는것
     # image를 처리하기 위해서 pillow을 깔아야한다.
     like_users = models.ManyToManyField(
