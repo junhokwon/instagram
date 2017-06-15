@@ -22,6 +22,7 @@ from post import views as post_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^post/', include('post.urls')),
+    url(r'^member/', include('member.urls')),
     # config에 항상 포함되는 공통적인 url요소를 넣어준다. 그리고
     # include(post.urls) : post.urls의 모든 정규표현식을 포함해라
     # include를 import했기 때문에 경로지정이 필요없다.

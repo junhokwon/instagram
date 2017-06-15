@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
@@ -107,25 +107,28 @@ def post_create(request):
         # post/post_create.html을 render해서 리턴
         return render(request, 'post/post_create.html')
 
+def post_modify(request,post_pk):
+    post = get_object_or_404(Post,pk=post_pk)
+    if request.method == 'POST':
+        photo = request.FILES['file']
+        user = User.objects.first()
+        post.photo = photo
+        post.author = user
+        post.save()
+        return redirect('post:post_detail',pk=post_pk)
+    elif request.method == 'GET':
+        context = {
+            'post' : post,
+        }
+        return render(request,'post/post_modify.html',context)
 
 
-# def post_modify(request, post_pk):
-#     post = Post.objects.get(pk=post_pk)
-#     if request.method == 'POST':
-#         data = request.POST
-#         image = request.FILES['photo']
-#         title = data['title']
-#         post.title = title
-#         post.image = image
-#         post.save()
-#         return redirect('post:post_detail',pk=post.pk)
-#     elif request.method == 'GET':
-#         context = {
-#             'post' : post,
-#         }
-#         return render(request,'post/post_modify.html',context)
-#
-#
+
+
+
+
+
+
 # def post_delete(request, post_pk):
 #     if request.method == 'POST':
 #         post = Post.objects.get(pk=post_pk)
