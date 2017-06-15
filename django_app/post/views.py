@@ -1,14 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
+
+from .models import Post
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 User = get_user_model()
-
-from .models import Post
 
 
 def post_list(request):
@@ -86,8 +86,8 @@ def post_create(request):
         # POST요청시 name이 'comment'인 input에서 전달된 값을 가져옴
         # dict.get()
         #   https://www.tutorialspoint.com/python/dictionary_get.htm
-        comment_string = request.POST.get('comment','')
-        # 빈 문자열 ''이나 None모두 False로 평가되므로,
+        comment_string = request.POST.get('comment', '')
+        # 빈 문자열 ''이나 None모두 False로 평가되므로
         # if not으로 댓글로 쓸 내용 또는 comment키가 전달되지 않았음을 검사 가능
         if comment_string:
             # 댓글로 사용할 문자열이 전달된 경우 위에서 생성한 post객체에 연결되는 Comment객체를 생성해준다
@@ -102,87 +102,36 @@ def post_create(request):
             #     author=user,
             #     content=comment_string,
             # )
-            return redirect('post:post_detail', post_pk=post.pk)
+        return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
         return render(request, 'post/post_create.html')
 
-def post_modify(request,post_pk):
-    post = get_object_or_404(Post,pk=post_pk)
-    if request.method == 'POST':
-        photo = request.FILES['file']
-        user = User.objects.first()
-        post.photo = photo
-        post.author = user
-        post.save()
-        return redirect('post:post_detail',pk=post_pk)
-    elif request.method == 'GET':
-        context = {
-            'post' : post,
-        }
-        return render(request,'post/post_modify.html',context)
+
+def post_modify(request, post_pk):
+    # 수정
+    pass
 
 
+def post_delete(request, post_pk):
+    # post_pk에 해당하는 Post에 대한 delete요청만을 받음
+    # 처리완료후에는 post_list페이지로 redirect
+    pass
 
 
+def comment_create(request, post_pk):
+    # POST요청을 받아 Comment객체를 생성 후 post_detail페이지로 redirect
+    pass
 
 
+def comment_modify(request, post_pk):
+    # 수정
+    pass
 
 
-# def post_delete(request, post_pk):
-#     if request.method == 'POST':
-#         post = Post.objects.get(pk=post_pk)
-#         post.delete()
-#         return redirect('post:post_list')
-#     else:
-#         return HttpResponse('GET Method은 올 수 없습니다.')
-#
-#
-#
-# def comment_create(request, post_pk):
-#     if request.method == 'GET':
-#         context = {
-#
-#         }
-#         return render(request, 'post/comment_create',context)
-#     elif request.method == 'POST':
-#         data = request.POST
-#         content = data['content']
-#         user = User.objects.first()
-#         post = Post.objects.all()
-#         comments = post.comment_set.create(
-#             content = content,
-#             author = user,
-#
-#         )
-#         return redirect('post:post_detail',pk=post_pk)
-#     # POST요청을 받아 Comment객체를 생성 후 post_detail페이지로 redirect
-#
-#
-# def comment_modify(request, post_pk):
-#     comment = Comment.objects.get(pk=post_pk)
-#     if request.method == 'POST':
-#         data = request.POST
-#         content = data['content']
-#         comment.content = content,
-#         comment.save()
-#         return redirect('post:post_detail',pk=post_pk)
-#     elif request.method == 'GET':
-#         context = {
-#             'comment' : comment,
-#         }
-#         return render(request,'post/comment_modify',context)
-#
-#
-#
-# def comment_delete(request, post_pk, comment_pk):
-#     # POST요청을 받아 Comment객체를 delete, 이후 post_detail페이지로 redirect
-#     if request.method == "POST":
-#         post = Post.objects.get(pk=post_pk)
-#         comments = post.comment_set.get(pk=comment_pk)
-#         comments.delete()
-#     else:
-#         return HttpResponse('get method은 올수 없습니다.')
+def comment_delete(request, post_pk, comment_pk):
+    # POST요청을 받아 Comment객체를 delete, 이후 post_detail페이지로 redirect
+    pass
 
 
 def post_anyway(request):
