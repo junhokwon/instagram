@@ -34,9 +34,15 @@ def login_fbv(request):
         #get요청이 왔을경우(다시 login.html로 그려준다.)
         if not request.user.is_authentificated:
             return redirect('post:post_list')
-        # 로그인이 되지 않을경우 user는 anonymous user을 가져온다.
+
         #만약 이미 로그인 된 상태일 경우에는
         # post_list로 redirect
         #아닐경우 login.html을 render에서 다시 리턴
+        # 로그인이 되지 않을경우 user는 anonymous user을 가져온다.
         return render(request,"member/login.html",)
+
+def logout(request):
+    # 로그아웃되면, post_list로 redirect
+    logout(request)
+    return redirect('post:post_list')
 
