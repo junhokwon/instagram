@@ -9,6 +9,14 @@
     </div>
   </header>
   <div class="post-photo-container">
+
+    {% if type == 'list'%}
+    <a href="{% url 'post:post_detail' post_pk=post.pk %}">
+      <img src="{{ post.photo.url }}" alt="">
+    </a>
+    {% else %}
+      <img src="{{ post.photo.url }}" alt="">
+    {% endif %}
     <img src="{{ post.photo.url }}" alt="">
   </div>
   <div class="post-btn-container">
@@ -22,7 +30,7 @@
   <p>좋아요 {{ post.like_count }}개</p>
   <div class="post-comment-container">
     <!--post에 연결된 Comment목록을 for문으로 순회하며 아래의 div.post-comment를 반복-->
-    {% for comment in post.comment_set.all|slice:":4" %}
+    {% for comment in post.comment_set.all %}
     <div class="post-comment">
       <a href="" class="comment-author">{{ comment.author }}</a>
       <span class="comment-content">{{ comment.content }}</span>

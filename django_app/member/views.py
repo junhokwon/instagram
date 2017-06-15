@@ -22,7 +22,7 @@ def login_fbv(request):
         )
         # user변수가 None이 아닐경우(정상적으로 인증되어 User객체를 얻은경우
         if user is not None:
-            login(request, user)
+            login_fbv(request, user)
             # django의 session을 이용해 이번 request,user객체를 사용해 로그인 처리
             return redirect('post:post_list')
         else:
@@ -30,9 +30,9 @@ def login_fbv(request):
             return HttpResponse('login credentials invalid')
 
 
-    elif request.method =='GET':
+    else:
         #get요청이 왔을경우(다시 login.html로 그려준다.)
-        if not request.user.is_authentificated:
+        if request.user.is_authenticated:
             return redirect('post:post_list')
 
         #만약 이미 로그인 된 상태일 경우에는

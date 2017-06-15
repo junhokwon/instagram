@@ -86,7 +86,7 @@ def post_create(request):
         # POST요청시 name이 'comment'인 input에서 전달된 값을 가져옴
         # dict.get()
         #   https://www.tutorialspoint.com/python/dictionary_get.htm
-        comment_string = request.POST.get('comment', '')
+        comment_string = request.POST.get('comment','')
         # 빈 문자열 ''이나 None모두 False로 평가되므로,
         # if not으로 댓글로 쓸 내용 또는 comment키가 전달되지 않았음을 검사 가능
         if comment_string:
@@ -102,7 +102,7 @@ def post_create(request):
             #     author=user,
             #     content=comment_string,
             # )
-        return redirect('post:post_detail', post_pk=post.pk)
+            return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
         return render(request, 'post/post_create.html')
