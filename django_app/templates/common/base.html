@@ -50,7 +50,8 @@
 				-->
 				<div>
 					{% if user.is_authenticated %}
-					<span>{{ user }}로 로그인 중</span>
+						<span>{{ user }}로 로그인 중</span>
+
 					<a href="{% url 'member:logout' %}" class="btn">로그아웃</a>
 					{% else %}
 					<a href="{% url 'member:login' %}" class="btn">로그인</a>
