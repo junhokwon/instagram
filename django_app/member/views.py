@@ -5,8 +5,7 @@ from django.contrib.auth import \
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from member.forms import SignupForm
-from .forms.login import LoginForm
+from .forms import LoginForm, SignupForm
 
 User = get_user_model()
 
@@ -17,6 +16,10 @@ def login(request):
     #   POST요청이 올 경우 좌측 코드를 기반으로 로그인 완료 후 post_list로 이동
     #   실패할경우 HttpResponse로 'Login invalid!'띄워주기
 
+    # member/urls.py생성
+    #   /member/login/으로 접근시 이 view로 오도록 설정
+    #   config/urls.py에 member/urls.py를 include
+    #       member/urls.py에 app_name설정으로 namespace지정
 
     # POST요청이 왔을 경우
     if request.method == 'POST':
@@ -45,15 +48,16 @@ def login(request):
         #   Bound form생성
         form = LoginForm(data=request.POST)
         # Bound form의 유효성을 검증
+        #   https://docs.djangoproject.com/en/1.11/topics/forms/#building-a-form-in-django
         if form.is_valid():
             user = form.cleaned_data['user']
             django_login(request, user)
+            # 일반적인 경우에는 post_list로 이동하지만,
+            # GET parameter의 next속성값이 있을 경우 해당 URL로 이동
+            next = request.GET.get('next')
+            if next:
+                return redirect(next)
             return redirect('post:post_list')
-
-        # user변수가 None일 경우 (username또는 password가 틀려 인증에 실패한 경우)
-        else:
-            # 로그인에 실패했음을 알림
-            return HttpResponse('Login credentials invalid')
     # GET요청이 왔을 경우 (단순 로그인 Form보여주기)
     else:
         # 만약 이미 로그인 된 상태일 경우에는
@@ -63,11 +67,11 @@ def login(request):
             return redirect('post:post_list')
         # LoginForm인스턴스를 생성해서 context에 넘김
         form = LoginForm()
-        context = {
-            'form': form,
-        }
-        # render시 context에는 LoginForm클래스형 form객체가 포함됨
-        return render(request, 'member/login.html', context)
+    context = {
+        'form': form,
+    }
+    # render시 context에는 LoginForm클래스형 form객체가 포함됨
+    return render(request, 'member/login.html', context)
 
 
 def logout(request):
@@ -107,27 +111,9 @@ def signup(request):
         ### Form을 사용한 경우
         form = SignupForm(data=request.POST)
         if form.is_valid():
-            user = form.cleaned_data['user']
-
-
-            # if User.objects.filter(username=username).exists():
-            #     # 이미 존재하는 username일경우
-            #     return HttpResponse('Username is already exist')
-            # password1과 password2가 같은지 검사
-            # elif password1 != password2:
-            #     # 다를경우
-            #     return HttpResponse('Password and Password check are not equal')
-            # # 위의 두 경우가 아닌 경우 유저를 생성
-            # user = User.objects.create_user(
-            #     username=username,
-            #     password=password1
-            # )
-
-            # 생성한 유저를 로그인 시킴
+            user = form.create_user()
             django_login(request, user)
-            # 이후 post_list뷰로 이동
             return redirect('post:post_list')
-
     else:
         form = SignupForm()
     context = {

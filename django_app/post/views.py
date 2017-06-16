@@ -5,8 +5,7 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from django.urls import reverse
 
-from post.forms import post
-from post.forms.post import PostForm
+from .forms.post import PostForm
 from .models import Post
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
@@ -71,11 +70,12 @@ def post_detail(request, post_pk):
     # 변환된 string을 HttpResponse형태로 돌려준다
     return HttpResponse(rendered_string)
 
+
 @login_required
 def post_create(request):
-
     # POST요청을 받아 Post객체를 생성 후 post_list페이지로 redirect
     if request.method == 'POST':
+        ### PostForm을 쓰지 않은경우
         # # get_user_model을 이용해서 얻은 User클래스(Django에서 인증에 사용하는 유저모델)에서 임의의 유저 한명을 가져온다.
         # user = User.objects.first()
         # # 새 Post객체를 생성하고 DB에 저장
@@ -106,22 +106,20 @@ def post_create(request):
         #     #     author=user,
         #     #     content=comment_string,
         #     # )
-            form = PostForm(data=request.POST,files=request.FILES)
-            if form.is_valid():
-                post = form.save(commit=False)
-                post.author = request.user
-                post.save()
-                return redirect('post:post_detail',post_pk=post.pk)
-
-
+        form = PostForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            # ModelForm의 save()메서드를 사용해서 Post객체를 가져옴
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post:post_detail', post_pk=post.pk)
     else:
-
-        form = PostForm()
-        context = {
-            'form' : form,
-        }
         # post/post_create.html을 render해서 리턴
-        return render(request, 'post/post_create.html',context)
+        form = PostForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'post/post_create.html', context)
 
 
 def post_modify(request, post_pk):

@@ -3,10 +3,11 @@ from django.contrib.auth import authenticate
 
 
 class LoginForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super().__init__(*args, **kwargs)
-        # ':' 추가
+    # Form and field validation
+    #   https://docs.djangoproject.com/en/1.11/ref/forms/validation/
+    # def __init__(self, *args, **kwargs):
+    #     kwargs.setdefault('label_suffix', '')
+    #     super().__init__(*args, **kwargs)
 
     username = forms.CharField(
         max_length=30,
@@ -28,10 +29,10 @@ class LoginForm(forms.Form):
     # 유효성 검증을 실행하는 메서드
     def clean(self):
         # clean()메서드를 실행한 기본결과 dict를 가져옴
-        cleaned_data = super().clean()
+        # cleaned_data = super().clean()
         # username, password를 가져와 로컬변수에 할당
-        username = cleaned_data.get('username')
-        password = cleaned_data.get('password')
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
 
         # username, password를 이용해 사용자 authenticate
         user = authenticate(
