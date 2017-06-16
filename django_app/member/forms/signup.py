@@ -24,6 +24,14 @@ class SignupForm(forms.Form):
             }
         )
     )
+    nickname = forms.CharField(
+        max_length=24,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder' : '닉네임을 입력하세요',
+            }
+        )
+    )
     password1 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
@@ -49,6 +57,14 @@ class SignupForm(forms.Form):
                 'Username already exist'
             )
         return username
+
+    def clean_nickname(self):
+        nickname = self.cleaned_data['nickname']
+        if User.objects.filter(nickname=nickname).exists():
+            raise forms.ValidationError(
+                'nickname already exist'
+            )
+        return nickname
 
     def clean_password2(self):
 
