@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # custom user
 
 AUTH_USER_MODEL = 'member.User'
+LOGIN_URL = 'member:login'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

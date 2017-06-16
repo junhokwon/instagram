@@ -86,3 +86,5 @@ class SignupForm(forms.Form):
             password=password1,
         )
         return user
+
+
