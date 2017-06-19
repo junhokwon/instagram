@@ -39,3 +39,10 @@ ul, ol {
   background-color: red;
   font-size: 14px;
 }
+
+.clearfix::after {
+  content: '';
+  display: block;
+  height: 0;
+  clear: both;
+}

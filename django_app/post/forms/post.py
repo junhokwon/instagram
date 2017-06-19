@@ -80,7 +80,7 @@ class PostForm(forms.ModelForm):
 
         self.instance.author = author
         # class BaseModelForm(BaseForm):에서 instance가 있건 없건,
-        # self.instance = opts = self._meta로 class Meta:에서 만들어 주었던,
+        # self.instance = opts = self._meta로 class Meta:에서 만들어 주었다.
         # photo와 comment가 들어있는 인스턴스를 생성해준다.
         # self.instance = instance라고 instance을 self.instance에 할당한다.
         # 즉, 이미 save()메서드를 실행했을때부터, self.instance는 생성되어있음.
