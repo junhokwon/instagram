@@ -14,7 +14,7 @@ urlpatterns = [
     # (2) 정규표현식에서 키워드인수 (?p<post_pk>\d+)로 주는방법
     url(r'^(?P<post_pk>\d+)/$', views.post_detail, name='post_detail'),
     url(r'^create/$', views.post_create, name = 'post_create'),
-
+    url(r'^(?P<post_pk>\d+)/modify/$', views.post_modify, name='post_modify'),
     # url(r'^.*/$', views.post_anyway, name= 'post_anyway'),
 
 ]

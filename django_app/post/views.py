@@ -113,6 +113,8 @@ def post_create(request):
             # 저장이 안되기때문에 pk값이 없어서 오류가 발생한다. 그래서 commit=False지우고 저장
             post = form.save(author=request.user)
             # post라는 객체를 가져와서 user를 새롭게 추가하고 다시 저장하겠다. 오버라이드하는방법
+            # author은 form자체내에서 해결할 수 없다. form.메서드호출(save)
+            # author만 제외하고 나머지는 form에서 처리해준다.
             # post.author = request.user
             # post.save()
 
@@ -133,7 +135,31 @@ def post_create(request):
     return render(request, 'post/post_create.html', context)
 
 def post_modify(request, post_pk):
-    pass
+    # 현재 수정하고자 하는 Post객체
+    post = Post.objects.get(pk=post_pk)
+
+    if request.method == 'POST':
+        form = PostForm(data=request.POST,files=request.FILES,instance=post)
+        form.save()
+        return redirect('post:post_detail',post_pk=post.pk)
+    else:
+        form = PostForm(instance=post)
+        context = {
+            'form' : form,
+        }
+        return render(request,'post/post_create.html',context)
+
+    # if request.method == 'POST':
+    #     photo = request.FILES['photo'],
+    #     post.photo = photo
+    #     post.save()
+    #     return redirect('post_detail', pk=post.pk)
+    # elif request.method=='GET':
+    #     context = {
+    #         'post' : post,
+    #
+    #     }
+    #     return render(request, 'blog/post_modify.html',context)
 
 
 

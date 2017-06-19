@@ -19,6 +19,12 @@ class Post(models.Model):
         related_name='like_posts',
         through='PostLike',
     )
+    my_comment = models.OneToOneField(
+        'Comment',
+        blank=True,
+        null=True,
+        related_name='+'
+    )
     tags = models.ManyToManyField('Tag', blank=True)
 
     class Meta:
@@ -55,7 +61,12 @@ class Comment(models.Model):
     content = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
-    my_comment = models.OneToOneField('Comment',related_name='+')
+    my_comment = models.OneToOneField(
+        'Comment',
+        related_name='+',
+        blank=True,
+        null=True,
+    )
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='CommentLike',
