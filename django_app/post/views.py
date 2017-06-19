@@ -109,9 +109,20 @@ def post_create(request):
         form = PostForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             # ModelForm의 save()메서드를 사용해서 Post객체를 가져옴
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
+            # form안쪽에서 한번에 처리할려고하면 commit=false면, 데이터베이스에
+            # 저장이 안되기때문에 pk값이 없어서 오류가 발생한다. 그래서 commit=False지우고 저장
+            post = form.save(author=request.user)
+            # post라는 객체를 가져와서 user를 새롭게 추가하고 다시 저장하겠다. 오버라이드하는방법
+            # post.author = request.user
+            # post.save()
+
+            # comment_string= form.cleaned_data['comment']
+            # #comment라는
+            # if comment_string:
+            #     post.comment_set.create(
+            #         content=comment_string,
+            #         author =post.author
+            #     )
             return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
@@ -121,10 +132,9 @@ def post_create(request):
     }
     return render(request, 'post/post_create.html', context)
 
-
 def post_modify(request, post_pk):
-    # 수정
     pass
+
 
 
 def post_delete(request, post_pk):

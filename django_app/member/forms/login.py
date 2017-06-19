@@ -9,6 +9,8 @@ class LoginForm(forms.Form):
     #     kwargs.setdefault('label_suffix', '')
     #     super().__init__(*args, **kwargs)
 
+
+
     username = forms.CharField(
         max_length=30,
         widget=forms.TextInput(
@@ -17,6 +19,7 @@ class LoginForm(forms.Form):
             }
         )
     )
+
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
@@ -50,3 +53,5 @@ class LoginForm(forms.Form):
                 'Login credentials not valid'
             )
         return self.cleaned_data
+
+
