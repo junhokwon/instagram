@@ -52,10 +52,6 @@ class SignupForm(forms.Form):
             )
         return password2
 
-
-
-
-
     def create_user(self):
         # 자신의 cleaned_data를 사용해서 유저를 생성
         # 생성한 유저를 반환

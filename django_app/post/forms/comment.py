@@ -1,16 +1,10 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
-from post.models import Comment
+from ..models import Comment
 
 
 class CommentForm(forms.ModelForm):
-
-    # comment = forms.CharField(
-    #     required=False,
-    #     widget=forms.TextInput
-    # )
-    #
-
     class Meta:
         model = Comment
         fields = [
@@ -20,17 +14,15 @@ class CommentForm(forms.ModelForm):
             'content': forms.TextInput(
                 attrs={
                     'class': 'input-comment',
-                    'placeholder': '댓글달기',
+                    'placeholder': '댓글 입력',
                 }
             )
         }
-        #필드를 리스트로 구성, 튜플일경우 수정하지 못함
 
     def clean_content(self):
         content = self.cleaned_data['content']
-        if len(content) <3:
-            raise ValueError('댓글은 최소 3자이상')
+        if len(content) < 3:
+            raise ValidationError(
+                '댓글은 최소 3자 이상이어야 합니다'
+            )
         return content
-
-
-

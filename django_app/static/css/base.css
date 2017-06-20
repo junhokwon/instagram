@@ -33,16 +33,16 @@ ul, ol {
   list-style-type: none;
 }
 
-.test {
-  padding: 10px;
-  color: white;
-  background-color: red;
-  font-size: 14px;
-}
-
 .clearfix::after {
   content: '';
   display: block;
   height: 0;
   clear: both;
+}
+
+.test {
+  padding: 10px;
+  color: white;
+  background-color: red;
+  font-size: 14px;
 }

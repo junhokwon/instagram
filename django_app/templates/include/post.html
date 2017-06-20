@@ -6,7 +6,7 @@
       <span class="header-author">{{ post.author }}</span>
     </div>
     <div class="post-header-right">
-
+      
     </div>
   </header>
   <div class="post-photo-container">
@@ -26,31 +26,20 @@
     <div class="post-btn-container clearfix">
       <div class="btn-left">
         <a href="#">
-        <img src="{% static 'images/post-heart.png' %}" alt="">
+        <img src="{% static 'images/post_heart.png' %}" alt="">
       </a>
         <a href="#">
-          <img src="{% static 'images/post-comment.png' %}" alt="">
+          <img src="{% static 'images/post_comment.png' %}" alt="">
         </a>
       </div>
       <div class="btn-right">
         {% if user == post.author %}
         <a href="{% url 'post:post_modify' post_pk=post.pk %}" class="btn">수정하기</a>
-        <form action="{% url 'post:post_delete' post_pk=post.pk %}" method="POST" class="form-inline">
-          {% csrf_token %}
-          <button type="submit" class="btn">삭제하기</button>
-        </form>
-
+        <a href="{% url 'post:post_delete' post_pk=post.pk %}" class="btn">삭제하기</a>
         {% endif %}
       </div>
     </div>
-
-    {% if post.like_users.all %}
-      <p class="comment">{% for user in post.like_users.all %}
-        <span>{{ user }}</span>{% endfor %}님이 좋아합니다.
-      </p>
-    {% endif %}
-
-    <!--<p class="comment">좋아요 {{ post.like_count }}개</p>-->
+    <p class="comment">좋아요 {{ post.like_count }}개</p>
     <div class="post-comment-container">
       <!--해당 post에 my_comment가 있을 경우 표시-->
       {% if post.my_comment %}
@@ -70,11 +59,9 @@
       {% endfor %}
     </div>
     <p class="created">{{ post.created_date }}</p>
-
     <form action="{% url 'post:comment_create' post_pk=post.pk %}?next={{ request.path }}#post-{{ post.pk }}" method="POST">
       {% csrf_token %}
       {{ comment_form.content }}
     </form>
-
   </div>
 </article>

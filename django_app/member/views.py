@@ -74,7 +74,6 @@ def login(request):
     return render(request, 'member/login.html', context)
 
 
-
 def logout(request):
     # 로그아웃되면 post_list로 redirect
     django_logout(request)
@@ -121,4 +120,3 @@ def signup(request):
         'form': form,
     }
     return render(request, 'member/signup.html', context)
-
