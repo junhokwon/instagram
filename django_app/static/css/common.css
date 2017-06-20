@@ -28,9 +28,22 @@
   box-sizing: border-box;
 }
 
+.field-wrapper input[type=file] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .field-wrapper p.help {
   font-size: 10px;
   color: #ccc;
   margin-top: 2px;
   margin-bottom: 0;
+}
+
+form.form-inline {
+  display: inline-block;
+}
+
+.btn-xs {
+  font-size: 10px;
 }

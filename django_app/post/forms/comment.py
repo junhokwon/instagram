@@ -5,40 +5,32 @@ from post.models import Comment
 
 class CommentForm(forms.ModelForm):
 
-
-    content = forms.CharField(
-        required=True,
-        widget=forms.TextInput
-    )
-
+    # comment = forms.CharField(
+    #     required=False,
+    #     widget=forms.TextInput
+    # )
+    #
 
     class Meta:
         model = Comment
-        fields = (
+        fields = [
             'content',
-        )
-
-    def save(self,**kwargs):
-        commit = kwargs.get('commit',True)
-        author = kwargs.pop('commit',None)
-
-
-        self.instance.author = author
-        instance = super().save(**kwargs)
-
-        comment_string = self.cleaned_data['comment']
-        if commit and comment_string:
-            instance.comment_set.create(
-                author = instance.author,
-                post = instance,
-                content = comment_string,
+        ]
+        widgets = {
+            'content': forms.TextInput(
+                attrs={
+                    'class': 'input-comment',
+                    'placeholder': '댓글달기',
+                }
             )
-        else:
-            instance.comment_set = Comment.objects.create(
-                author=author,
-                post=instance,
-                content=comment_string,
-                )
-            instance.save()
-        return instance
+        }
+        #필드를 리스트로 구성, 튜플일경우 수정하지 못함
+
+    def clean_content(self):
+        content = self.cleaned_data['content']
+        if len(content) <3:
+            raise ValueError('댓글은 최소 3자이상')
+        return content
+
+
 

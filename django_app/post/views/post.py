@@ -1,19 +1,26 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
 from post.decorators import post_owner
-from post.forms.comment import CommentForm
-
-from .forms.post import PostForm
-from .models import Post, Comment
+from post.forms import CommentForm
+from ..forms import PostForm
+from ..models import Post
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 User = get_user_model()
+
+__all__ = (
+    'post_list',
+    'post_detail',
+    'post_create',
+    'post_modify',
+    'post_delete',
+)
 
 
 def post_list(request):
@@ -21,9 +28,11 @@ def post_list(request):
     # post/post_list.html을 template으로 사용하도록 한다
 
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
+    # 각 post하나당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
     posts = Post.objects.all()
     context = {
         'posts': posts,
+        'comment_form': CommentForm(),
     }
     return render(request, 'post/post_list.html', context)
 
@@ -36,7 +45,7 @@ def post_detail(request, post_pk):
     # 가져오는 과정에서 예외처리를 한다 (Model.DoesNotExist)
     try:
         post = Post.objects.get(pk=post_pk)
-    except Post.DoesNotExist as e:
+    except Post.DoesNotExist:
         # 1. 404 Notfound를 띄워준다
         # return HttpResponseNotFound('Post not found, detail: {}'.format(e))
 
@@ -112,22 +121,7 @@ def post_create(request):
         form = PostForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             # ModelForm의 save()메서드를 사용해서 Post객체를 가져옴
-            # form안쪽에서 한번에 처리할려고하면 commit=false면, 데이터베이스에
-            # 저장이 안되기때문에 pk값이 없어서 오류가 발생한다. 그래서 commit=False지우고 저장
             post = form.save(author=request.user)
-            # post라는 객체를 가져와서 user를 새롭게 추가하고 다시 저장하겠다. 오버라이드하는방법
-            # author은 form자체내에서 해결할 수 없다. form.메서드호출(save)
-            # author만 제외하고 나머지는 form에서 처리해준다.
-            # post.author = request.user
-            # post.save()
-
-            # comment_string= form.cleaned_data['comment']
-            # #comment라는
-            # if comment_string:
-            #     post.comment_set.create(
-            #         content=comment_string,
-            #         author =post.author
-            #     )
             return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
@@ -136,85 +130,37 @@ def post_create(request):
         'form': form,
     }
     return render(request, 'post/post_create.html', context)
+
+
 @post_owner
 @login_required
 def post_modify(request, post_pk):
-    # 현재 수정하고자 하는 Post객체
+    # 현재 수정하고자하는 Post객체
     post = Post.objects.get(pk=post_pk)
 
     if request.method == 'POST':
-        form = PostForm(data=request.POST,files=request.FILES,instance=post)
+        form = PostForm(data=request.POST, files=request.FILES, instance=post)
         form.save()
-        return redirect('post:post_detail',post_pk=post.pk)
+        return redirect('post:post_detail', post_pk=post.pk)
     else:
         form = PostForm(instance=post)
-        context = {
-            'form' : form,
-        }
-        return render(request,'post/post_modify.html',context)
+    context = {
+        'form': form,
+    }
+    return render(request, 'post/post_modify.html', context)
 
-    # if request.method == 'POST':
-    #     photo = request.FILES['photo'],
-    #     post.photo = photo
-    #     post.save()
-    #     return redirect('post_detail', pk=post.pk)
-    # elif request.method=='GET':
-    #     context = {
-    #         'post' : post,
-    #
-    #     }
-    #     return render(request, 'blog/post_modify.html',context)
 
 @post_owner
 @login_required
 def post_delete(request, post_pk):
     # post_pk에 해당하는 Post에 대한 delete요청만을 받음
     # 처리완료후에는 post_list페이지로 redirect
-    post = get_object_or_404(Post,pk=post_pk)
+    post = get_object_or_404(Post, pk=post_pk)
     if request.method == 'POST':
         post.delete()
         return redirect('post:post_list')
     else:
         context = {
-            'post' : post,
+            'post': post,
         }
-        return render(request,'post/post_delete.html',context)
-
-
-# class Comment(models.Model):
-#     post = models.ForeignKey(Post)
-#     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-#     content = models.TextField()
-#     created_date = models.DateTimeField(auto_now_add=True)
-#     modified_date = models.DateTimeField(auto_now=True)
-#     like_users = models.ManyToManyField(
-#         settings.AUTH_USER_MODEL,
-#         through='CommentLike',
-#         related_name='like_comments',
-#     )
-
-@login_required
-def comment_create(request, post_pk):
-    # POST요청을 받아 Comment객체를 생성 후 post_detail페이지로 redirect
-    post= Post.objects.get(pk=post_pk)
-
-    if request.method == 'POST':
-        form = CommentForm(data=request.POST,instance=post,author=request.user)
-        form.save()
-        return redirect('post:post_detail',pk=post_pk)
-
-
-
-
-def comment_modify(request, post_pk):
-    # 수정
-    pass
-
-
-def comment_delete(request, post_pk, comment_pk):
-    # POST요청을 받아 Comment객체를 delete, 이후 post_detail페이지로 redirect
-    pass
-
-
-def post_anyway(request):
-    return redirect('post:post_list')
+        return render(request, 'post/post_delete.html', context)

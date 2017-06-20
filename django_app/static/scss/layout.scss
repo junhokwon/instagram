@@ -84,3 +84,15 @@ form.form-inline-login {
 .container > .content {
   padding: 10px;
 }
+
+.messages {
+  width: 80%;
+  position: fixed;
+  left: 10%;
+  top: 5%;
+  padding: 20px;
+  border: 1px solid $color-border;
+  font-size: 14px;
+  text-align: center;
+
+}
