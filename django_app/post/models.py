@@ -29,6 +29,7 @@ class Post(models.Model):
 
     class Meta:
         ordering =['-pk',]
+        # post만들어진 역순으로 정렬
 
     def add_comment(self, user, content):
         # 자신을 post로 갖고, 전달받은 user를 author로 가지며
@@ -61,12 +62,6 @@ class Comment(models.Model):
     content = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
-    my_comment = models.OneToOneField(
-        'Comment',
-        related_name='+',
-        blank=True,
-        null=True,
-    )
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='CommentLike',

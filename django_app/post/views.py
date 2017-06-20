@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
+from post.decorators import post_owner
+from post.forms.comment import CommentForm
+
 from .forms.post import PostForm
-from .models import Post
+from .models import Post, Comment
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
@@ -133,7 +136,8 @@ def post_create(request):
         'form': form,
     }
     return render(request, 'post/post_create.html', context)
-
+@post_owner
+@login_required
 def post_modify(request, post_pk):
     # 현재 수정하고자 하는 Post객체
     post = Post.objects.get(pk=post_pk)
@@ -147,7 +151,7 @@ def post_modify(request, post_pk):
         context = {
             'form' : form,
         }
-        return render(request,'post/post_create.html',context)
+        return render(request,'post/post_modify.html',context)
 
     # if request.method == 'POST':
     #     photo = request.FILES['photo'],
@@ -161,17 +165,45 @@ def post_modify(request, post_pk):
     #     }
     #     return render(request, 'blog/post_modify.html',context)
 
-
-
+@post_owner
+@login_required
 def post_delete(request, post_pk):
     # post_pk에 해당하는 Post에 대한 delete요청만을 받음
     # 처리완료후에는 post_list페이지로 redirect
-    pass
+    post = get_object_or_404(Post,pk=post_pk)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('post:post_list')
+    else:
+        context = {
+            'post' : post,
+        }
+        return render(request,'post/post_delete.html',context)
 
 
+# class Comment(models.Model):
+#     post = models.ForeignKey(Post)
+#     author = models.ForeignKey(settings.AUTH_USER_MODEL)
+#     content = models.TextField()
+#     created_date = models.DateTimeField(auto_now_add=True)
+#     modified_date = models.DateTimeField(auto_now=True)
+#     like_users = models.ManyToManyField(
+#         settings.AUTH_USER_MODEL,
+#         through='CommentLike',
+#         related_name='like_comments',
+#     )
+
+@login_required
 def comment_create(request, post_pk):
     # POST요청을 받아 Comment객체를 생성 후 post_detail페이지로 redirect
-    pass
+    post= Post.objects.get(pk=post_pk)
+
+    if request.method == 'POST':
+        form = CommentForm(data=request.POST,instance=post,author=request.user)
+        form.save()
+        return redirect('post:post_detail',pk=post_pk)
+
+
 
 
 def comment_modify(request, post_pk):
