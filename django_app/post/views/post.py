@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -8,7 +9,7 @@ from django.urls import reverse
 from post.decorators import post_owner
 from post.forms import CommentForm
 from ..forms import PostForm
-from ..models import Post
+from ..models import Post, Tag
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
@@ -20,15 +21,22 @@ __all__ = (
     'post_create',
     'post_modify',
     'post_delete',
+    'hashtag_post_list',
 )
 
 
-def post_list(request):
+def post_list_original(request):
     # 모든 Post목록을 'posts'라는 key로 context에 담아 return render처리
     # post/post_list.html을 template으로 사용하도록 한다
 
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
     # 각 post하나당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
+
+    # 숙제
+    # 1. post_list와 hashtag_post_list에서 pagination을 이용해서
+    #    한 번에 10개씩만 표시하도록 수정
+    #   https://docs.djangoproject.com/en/1.11/topics/pagination/
+    # 2. 좋아요 버튼 구현 및 좋아요 한 사람 목록 출력
     posts = Post.objects.all()
     context = {
         'posts': posts,
@@ -36,6 +44,31 @@ def post_list(request):
     }
     return render(request, 'post/post_list.html', context)
 
+def post_list(request):
+    # 전체 Post목록 가져와서 쿼리셋 생성
+    all_posts = Post.objects.all()
+    # Paginator객체 생성 한 페이지당 3개씩
+    paginator = Paginator(all_posts,3)
+
+    # get 인자에서 'page'에 대한 값을 `page_num`이라는 변수에 할당
+    page_num = request.GET.get('page')
+
+    # paginator 객체에서 page메서드로 page_num변수를 인수로 전달,
+    try:
+        # paginator 객체에서 page메서드로 page_num변수를 인수로 전달
+        posts = paginator.page(page_num)
+        #page메서드를 속성으로 실행하면, page형 인스턴스 자체를 돌려준다.
+
+    except PageNotAnInteger:
+        # 만약 page_num에 객체가 없을 경우(빈페이지)
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
+    context = {
+        'posts':posts,
+    }
+    return render(request,'post_list.html',context)
 
 def post_detail(request, post_pk):
     # Model(DB)에서 post_pk에 해당하는 Post객체를 가져와 변수에 할당
@@ -182,4 +215,18 @@ def hashtag_post_list(request, tag_name):
     # 4. 해당 쿼리셋을 적절히 리턴
     # 5. Comment의 make_html_and_add_tags()메서드의
     #    a태그를 생성하는 부분에 이 view에 연결되는 URL을 삽입
-    pass
+    tag = get_object_or_404(Tag, name=tag_name)
+
+    # Post에 달린 댓글의 Tag까지 검색할 때
+    # posts = Post.objects.filter(comment__tags=tag).distinct()
+
+    # Post의 my_comment에 있는 Tag만 검색할 때
+    posts = Post.objects.filter(my_comment__tags=tag)
+    posts_count = posts.count()
+
+    context = {
+        'tag': tag,
+        'posts': posts,
+        'posts_count': posts_count,
+    }
+    return render(request, 'post/hashtag_post_list.html', context)

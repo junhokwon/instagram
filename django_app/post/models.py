@@ -7,6 +7,7 @@ member application생성
 import re
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class Post(models.Model):
@@ -35,6 +36,10 @@ class Post(models.Model):
         # content를 content필드내용으로 넣는 Comment객체 생성
         return self.comment_set.create(author=user, content=content)
 
+    # def add_tag(self,tag_name):
+    #     tag,tag_created = Tag.objects.get_or_create(name=tag_name)
+    #     if not self.tags.filter(id=tag.id).exists():
+    #         self.tags.add(tag)
     @property
     def like_count(self):
         # 자신을 like하고 있는 user수 리턴
@@ -62,8 +67,6 @@ class Comment(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            super().save(*args, **kwargs)
         self.make_html_content_and_add_tags()
         super().save(*args, **kwargs)
 
@@ -79,17 +82,18 @@ class Comment(models.Model):
             # Tag객체를 가져오거나 생성, 생성여부는 쓰지않는 변수이므로 _처리
             tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
             # 기존 content의 내용을 변경
-            ori_content = ori_content.replace(
-                tag_name,
-                '<a href="#" class="hash-tag">{}</a>'.format(
-                    tag_name
-                )
+            change_tag = '<a href="{url}" class="hash-tag">{tag_name}</a>'.format(
+                # url=reverse('post:hashtag_post_list', args=[tag_name.replace('#', '')]),
+                url=reverse('post:hashtag_post_list', kwargs={'tag_name': tag_name.replace('#', '')}),
+                tag_name=tag_name
             )
+            ori_content = re.sub(r'{}(?![<\w])'.format(tag_name), change_tag, ori_content, count=1)
             # content에 포함된 Tag목록을 자신의 tags필드에 추가
             if not self.tags.filter(pk=tag.pk).exists():
                 self.tags.add(tag)
         # 편집이 완료된 문자열을 html_content에 저장
         self.html_content = ori_content
+        super().save(update_fields=['html_content'])
 
 
 class CommentLike(models.Model):
